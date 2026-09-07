@@ -194,12 +194,12 @@
   .section.compact .lane-title{font-size:11px; margin-bottom:8px;}
 
   .grid-2.hero-grid{grid-template-columns:1fr 1fr;}
-  .hero-grid .fstep{flex:1 1 62px; min-width:62px;}
-  .hero-grid .fval{font-size:15px;}
-  .hero-grid .fpct{font-size:10px;}
-  .hero-grid .flabel{font-size:10px;}
-  .hero-grid .fbar-track{height:88px;}
-  .hero-grid .fchevron{margin-bottom:40px;}
+  .section.compact .fstep{flex:1 1 62px; min-width:62px;}
+  .section.compact .fval{font-size:15px;}
+  .section.compact .fpct{font-size:10px;}
+  .section.compact .flabel{font-size:10px;}
+  .section.compact .fbar-track{height:88px;}
+  .section.compact .fchevron{margin-bottom:40px;}
   @media (max-width:680px){
     .grid-2.hero-grid{grid-template-columns:1fr;}
   }
@@ -301,39 +301,37 @@
   <!-- KPI strip -->
   <div class="kpi-strip" id="kpiStrip"></div>
 
-  <div class="grid-2 hero-grid" style="align-items:start;">
-    <!-- Lifecycle status map -->
-    <div class="section compact">
-      <div class="section-head">
-        <h2>Lifecycle status map</h2>
-        <span class="sub">every lead has a visible destination</span>
-      </div>
-
-      <div class="lane">
-        <div class="lane-title"><span class="dot" style="background:var(--primary)"></span>1 · Marketing qualification</div>
-        <div class="lane-row" id="lane1"></div>
-      </div>
-
-      <div class="lane-drop">↓</div>
-
-      <div class="lane">
-        <div class="lane-title"><span class="dot" style="background:var(--heliotrope)"></span>2 · SDR feedback checkpoint</div>
-        <div class="lane-row" id="lane2"></div>
-      </div>
+  <!-- Lifecycle status map -->
+  <div class="section compact" style="max-width:640px;">
+    <div class="section-head">
+      <h2>Lifecycle status map</h2>
+      <span class="sub">every lead has a visible destination</span>
     </div>
 
-    <!-- Funnel -->
-    <div class="section">
-      <div class="section-head">
-        <h2>Accepted-lead conversion funnel</h2>
-        <div class="funnel-toggle" id="funnelToggle">
-          <button class="active" data-mode="count">Count</button>
-          <button data-mode="pct">Rate</button>
-        </div>
-      </div>
-      <div class="sub" style="margin:-10px 0 14px;">outreach begins only after SDR acceptance</div>
-      <div class="funnel" id="funnel"></div>
+    <div class="lane">
+      <div class="lane-title"><span class="dot" style="background:var(--primary)"></span>1 · Marketing qualification</div>
+      <div class="lane-row" id="lane1"></div>
     </div>
+
+    <div class="lane-drop">↓</div>
+
+    <div class="lane">
+      <div class="lane-title"><span class="dot" style="background:var(--heliotrope)"></span>2 · SDR feedback checkpoint</div>
+      <div class="lane-row" id="lane2"></div>
+    </div>
+  </div>
+
+  <!-- Funnel -->
+  <div class="section compact" style="max-width:640px;">
+    <div class="section-head">
+      <h2>Accepted-lead conversion funnel</h2>
+      <div class="funnel-toggle" id="funnelToggle">
+        <button class="active" data-mode="count">Count</button>
+        <button data-mode="pct">Rate</button>
+      </div>
+    </div>
+    <div class="sub" style="margin:-10px 0 14px;">outreach begins only after SDR acceptance</div>
+    <div class="funnel" id="funnel"></div>
   </div>
 
   <!-- Channel + Asset performance -->
