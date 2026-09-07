@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>MQL → Meeting Performance</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#F3F4FA;
+    --surface:#FFFFFF;
+    --surface-2:#F8F8FD;
+    --ink:#0C1730;
+    --ink-soft:#4A5270;
+    --muted:#8B92AC;
+    --line:#E4E5F1;
+    --primary:#3F11F7;
+    --primary-ink:#2E0CC4;
+    --navy:#061C37;
+    --heliotrope:#CD7AF1;
+    --amber:#FFAC00;
+    --coral:#FA8D83;
+    --track:#ECEDF7;
+    --good:#1E9E6B;
+    --shadow-hero: 0 24px 60px -30px rgba(63,17,247,0.35);
+  }
+  :root:not([data-theme="light"]){
+    @media (prefers-color-scheme: dark){
+      --bg:#080B18;
+      --surface:#0E1326;
+      --surface-2:#111731;
+      --ink:#EDEFFA;
+      --ink-soft:#B7BCDA;
+      --muted:#767EA0;
+      --line:#212745;
+      --primary:#8C6BFF;
+      --primary-ink:#B39BFF;
+      --navy:#0B152B;
+      --track:#1A2040;
+      --shadow-hero: 0 24px 60px -30px rgba(140,107,255,0.35);
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#080B18;
+    --surface:#0E1326;
+    --surface-2:#111731;
+    --ink:#EDEFFA;
+    --ink-soft:#B7BCDA;
+    --muted:#767EA0;
+    --line:#212745;
+    --primary:#8C6BFF;
+    --primary-ink:#B39BFF;
+    --navy:#0B152B;
+    --track:#1A2040;
+    --shadow-hero: 0 24px 60px -30px rgba(140,107,255,0.35);
+  }
+
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:'Inter',system-ui,sans-serif;
+    -webkit-font-smoothing:antialiased;
+    padding:28px 20px 80px;
+  }
+  .wrap{max-width:1180px;margin:0 auto;}
+  .num, .mono{font-family:'JetBrains Mono','Space Grotesk',monospace;}
+  h1,h2,h3{font-family:'Space Grotesk',sans-serif; margin:0;}
+
+  /* ---------- Header ---------- */
+  .topbar{
+    display:flex; align-items:flex-end; justify-content:space-between;
+    gap:20px; flex-wrap:wrap; margin-bottom:22px;
+  }
+  .brand{display:flex; align-items:center; gap:12px;}
+  .brand-mark{
+    width:38px;height:38px;border-radius:10px;
+    background:linear-gradient(135deg,var(--primary),var(--heliotrope));
+    display:flex;align-items:center;justify-content:center;
+    color:#fff;font-family:'Space Grotesk';font-weight:700;font-size:18px;
+    box-shadow:0 8px 20px -8px rgba(63,17,247,0.6);
+    flex-shrink:0;
+  }
+  .titles h1{font-size:26px; font-weight:600; letter-spacing:-0.01em; color:var(--ink);}
+  .titles p{margin:4px 0 0; font-size:13.5px; color:var(--muted);}
+
+  .filters{display:flex; gap:8px; flex-wrap:wrap;}
+  select.filter{
+    appearance:none; -webkit-appearance:none;
+    background:var(--surface);
+    border:1px solid var(--line);
+    color:var(--ink-soft);
+    font:500 13px 'Inter';
+    padding:9px 30px 9px 14px;
+    border-radius:9px;
+    cursor:pointer;
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='6'><path d='M0 0L5 6L10 0' fill='none' stroke='%238B92AC' stroke-width='1.4'/></svg>");
+    background-repeat:no-repeat;
+    background-position:right 12px center;
+    transition:border-color .15s;
+  }
+  select.filter:hover{border-color:var(--primary);}
+  select.filter:focus-visible{outline:2px solid var(--primary); outline-offset:1px;}
+
+  /* ---------- KPI strip ---------- */
+  .kpi-strip{
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:16px;
+    display:grid;
+    grid-template-columns:repeat(6,1fr);
+    box-shadow: var(--shadow-hero);
+    margin-bottom:26px;
+    overflow:hidden;
+  }
+  .kpi{
+    padding:20px 18px;
+    border-right:1px solid var(--line);
+    position:relative;
+  }
+  .kpi:last-child{border-right:none;}
+  .kpi .label{font-size:12px; color:var(--muted); font-weight:500; line-height:1.35; min-height:32px;}
+  .kpi .value{font-size:26px; font-weight:600; margin-top:8px; letter-spacing:-0.02em;}
+  .kpi .value.accent{color:var(--good);}
+  .kpi::before{
+    content:""; position:absolute; top:0; left:0; right:0; height:3px;
+    background:var(--kpi-color, var(--primary)); opacity:0; transition:opacity .2s;
+  }
+  .kpi:hover::before{opacity:1;}
+
+  @media (max-width:920px){
+    .kpi-strip{grid-template-columns:repeat(3,1fr);}
+    .kpi:nth-child(3){border-right:none;}
+  }
+  @media (max-width:560px){
+    .kpi-strip{grid-template-columns:repeat(2,1fr);}
+    .kpi:nth-child(2n){border-right:none;}
+  }
+
+  /* ---------- Section shell ---------- */
+  .section{
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:16px;
+    padding:24px 24px 26px;
+    margin-bottom:20px;
+  }
+  .section-head{display:flex; align-items:baseline; justify-content:space-between; gap:12px; margin-bottom:18px; flex-wrap:wrap;}
+  .section-head h2{font-size:16.5px; font-weight:600;}
+  .section-head .sub{font-size:12.5px; color:var(--muted); font-weight:400; font-family:'Inter';}
+  .section-head .step-label{font-size:11px; color:var(--primary); font-weight:600; letter-spacing:.02em; font-family:'Inter'; background:color-mix(in srgb, var(--primary) 12%, transparent); padding:3px 9px; border-radius:20px;}
+
+  /* ---------- Lifecycle map ---------- */
+  .lane{margin-bottom:20px;}
+  .lane:last-child{margin-bottom:0;}
+  .lane-title{font-size:12px; color:var(--muted); font-weight:600; margin-bottom:10px; display:flex; align-items:center; gap:8px;}
+  .lane-title .dot{width:7px;height:7px;border-radius:50%;background:var(--primary);}
+  .lane-row{display:flex; align-items:stretch; gap:0;}
+  .node{
+    flex:1; min-width:0; padding:14px 16px; border-radius:10px;
+    background:var(--surface-2);
+    border:1px solid var(--line);
+    position:relative;
+  }
+  .node .n-val{font-size:21px; font-weight:600; font-family:'Space Grotesk';}
+  .node .n-label{font-size:11.5px; color:var(--ink-soft); margin-top:3px; line-height:1.3;}
+  .node.n-primary{background:color-mix(in srgb, var(--primary) 10%, var(--surface-2)); border-color:color-mix(in srgb, var(--primary) 35%, var(--line));}
+  .node.n-warn{background:color-mix(in srgb, var(--amber) 14%, var(--surface-2)); border-color:color-mix(in srgb, var(--amber) 35%, var(--line));}
+  .node.n-danger{background:color-mix(in srgb, var(--coral) 14%, var(--surface-2)); border-color:color-mix(in srgb, var(--coral) 35%, var(--line));}
+  .node.n-good{background:color-mix(in srgb, var(--good) 12%, var(--surface-2)); border-color:color-mix(in srgb, var(--good) 35%, var(--line));}
+  .arrow{
+    flex:0 0 26px; display:flex; align-items:center; justify-content:center;
+    color:var(--muted);
+  }
+  .lane-drop{
+    display:flex; justify-content:flex-start; padding:6px 0 6px 12px; color:var(--muted);
+  }
+
+  @media (max-width:760px){
+    .lane-row{flex-direction:column; gap:8px;}
+    .arrow{display:none;}
+  }
+
+  /* ---------- Funnel ---------- */
+  .funnel-toggle{display:flex; gap:4px; background:var(--surface-2); border:1px solid var(--line); border-radius:9px; padding:3px;}
+  .funnel-toggle button{
+    border:none; background:transparent; font:600 12px 'Inter'; padding:6px 12px; border-radius:6px;
+    color:var(--muted); cursor:pointer; transition:.15s;
+  }
+  .funnel-toggle button.active{background:var(--surface); color:var(--primary); box-shadow:0 1px 3px rgba(0,0,0,.08);}
+  .funnel{display:flex; align-items:flex-end; gap:6px; margin-top:6px;}
+  .fstep{flex:1; min-width:0; text-align:center; cursor:default;}
+  .fstep .fval{font-family:'Space Grotesk'; font-size:19px; font-weight:600;}
+  .fstep .fpct{font-size:11px; color:var(--muted); margin-bottom:8px; font-family:'JetBrains Mono';}
+  .fbar-track{height:120px; display:flex; align-items:flex-end; background:var(--track); border-radius:8px 8px 3px 3px; overflow:hidden;}
+  .fbar{
+    width:100%; border-radius:8px 8px 0 0;
+    background:linear-gradient(180deg, var(--primary), var(--primary-ink));
+    transition:height .5s cubic-bezier(.2,.8,.2,1);
+  }
+  .fstep.final .fbar{background:linear-gradient(180deg, var(--good), #157A50);}
+  .fstep .flabel{font-size:11px; color:var(--ink-soft); margin-top:9px; line-height:1.3; font-weight:500;}
+  .fchevron{align-self:flex-end; margin-bottom:52px; color:var(--muted); flex:0 0 12px;}
+  @media (max-width:820px){
+    .funnel{overflow-x:auto; padding-bottom:6px;}
+    .fstep{min-width:88px;}
+  }
+
+  /* ---------- Two-column tables ---------- */
+  .grid-2{display:grid; grid-template-columns:1fr 1fr; gap:20px;}
+  @media (max-width:860px){.grid-2{grid-template-columns:1fr;}}
+  table{width:100%; border-collapse:collapse; font-size:13px;}
+  th{
+    text-align:left; font-size:11px; text-transform:none; color:var(--muted);
+    font-weight:600; padding:0 10px 10px; border-bottom:1px solid var(--line);
+  }
+  th.num, td.num{text-align:right; font-family:'JetBrains Mono';}
+  td{padding:11px 10px; border-bottom:1px solid var(--line); color:var(--ink-soft);}
+  td.name{color:var(--ink); font-weight:500; font-family:'Inter';}
+  tbody tr{transition:background .12s;}
+  tbody tr:hover{background:var(--surface-2);}
+  tbody tr:last-child td{border-bottom:none;}
+  .pill{
+    display:inline-block; padding:2px 7px; border-radius:5px; font-size:11.5px; font-weight:600;
+    font-family:'JetBrains Mono';
+  }
+  .pill.hi{background:color-mix(in srgb, var(--good) 16%, transparent); color:var(--good);}
+  .pill.lo{background:color-mix(in srgb, var(--coral) 18%, transparent); color:#C24A3E;}
+  .pill.mid{background:color-mix(in srgb, var(--amber) 20%, transparent); color:#9A6A00;}
+
+  /* ---------- Reason panels ---------- */
+  .grid-3{display:grid; grid-template-columns:repeat(3,1fr); gap:20px;}
+  @media (max-width:900px){.grid-3{grid-template-columns:1fr;}}
+  .rpanel{border:1px solid var(--line); border-radius:12px; padding:16px 16px 14px; background:var(--surface-2);}
+  .rpanel-head{display:flex; align-items:center; gap:8px; margin-bottom:2px; cursor:pointer; user-select:none;}
+  .rpanel-head .bar-dot{width:9px;height:9px;border-radius:3px; flex-shrink:0;}
+  .rpanel-head h3{font-size:13.5px; font-weight:600;}
+  .rpanel-sub{font-size:11px; color:var(--muted); margin:2px 0 14px 17px;}
+  .rrow{display:flex; align-items:center; gap:10px; margin-bottom:11px;}
+  .rrow:last-child{margin-bottom:0;}
+  .rrow .rname{flex:0 0 132px; font-size:12px; color:var(--ink-soft); line-height:1.3;}
+  .rrow .rtrack{flex:1; height:7px; background:var(--track); border-radius:4px; overflow:hidden;}
+  .rrow .rfill{height:100%; border-radius:4px; transition:width .5s ease;}
+  .rrow .rval{flex:0 0 22px; text-align:right; font-family:'JetBrains Mono'; font-size:12px; font-weight:600; color:var(--ink);}
+
+  .legend-note{display:flex; align-items:center; gap:6px; font-size:11px; color:var(--muted); margin-top:14px;}
+
+  footer{text-align:center; font-size:11.5px; color:var(--muted); margin-top:30px;}
+  footer a{color:var(--primary); text-decoration:none;}
+
+  ::selection{background:color-mix(in srgb, var(--primary) 30%, transparent);}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="topbar">
+    <div class="brand">
+      <div class="brand-mark">OX</div>
+      <div class="titles">
+        <h1>MQL → Meeting Performance</h1>
+        <p>Illustrative data · clear ownership and lifecycle statuses</p>
+      </div>
+    </div>
+    <div class="filters">
+      <select class="filter" id="rangeSelect">
+        <option value="30d" selected>Last 30 Days</option>
+        <option value="week">This Week</option>
+        <option value="month">This Month</option>
+        <option value="quarter">This Quarter</option>
+      </select>
+      <select class="filter"><option>All regions</option><option>AMS</option><option>EMEA</option><option>APAC</option><option>Other</option></select>
+      <select class="filter"><option>All channels</option><option>Paid</option><option>Organic</option><option>Events</option><option>Other</option></select>
+      <select class="filter"><option>All SDRs</option><option>Jane Doe</option><option>John Doe</option></select>
+    </div>
+  </div>
+
+  <!-- KPI strip -->
+  <div class="kpi-strip" id="kpiStrip"></div>
+
+  <!-- Lifecycle status map -->
+  <div class="section">
+    <div class="section-head">
+      <h2>Lifecycle status map</h2>
+      <span class="sub">every lead has a visible destination</span>
+    </div>
+
+    <div class="lane">
+      <div class="lane-title"><span class="dot" style="background:var(--primary)"></span>1 · Marketing qualification</div>
+      <div class="lane-row" id="lane1"></div>
+    </div>
+
+    <div class="lane-drop">↓</div>
+
+    <div class="lane">
+      <div class="lane-title"><span class="dot" style="background:var(--heliotrope)"></span>2 · SDR feedback checkpoint</div>
+      <div class="lane-row" id="lane2"></div>
+    </div>
+  </div>
+
+  <!-- Funnel -->
+  <div class="section">
+    <div class="section-head">
+      <h2>Accepted-lead conversion funnel</h2>
+      <div class="funnel-toggle" id="funnelToggle">
+        <button class="active" data-mode="count">Count</button>
+        <button data-mode="pct">Rate</button>
+      </div>
+    </div>
+    <div class="sub" style="margin:-10px 0 14px;">outreach begins only after SDR acceptance</div>
+    <div class="funnel" id="funnel"></div>
+  </div>
+
+  <!-- Channel + Asset performance -->
+  <div class="grid-2">
+    <div class="section">
+      <div class="section-head">
+        <h2>Sub-Channel performance</h2>
+        <span class="sub">from new leads to opportunity</span>
+        <div class="funnel-toggle" id="channelToggle">
+          <button class="active" data-mode="rate">Rate</button>
+          <button data-mode="count">Count</button>
+        </div>
+      </div>
+      <table>
+        <thead><tr><th>Sub-Channel</th><th class="num">Leads</th><th class="num" id="channelCol2Head">Lead→MQL</th><th class="num" id="channelCol3Head">MQL→Mtg</th><th class="num" id="channelLastHead">Mtg→Opp</th></tr></thead>
+        <tbody id="channelBody"></tbody>
+      </table>
+    </div>
+
+    <div class="section">
+      <div class="section-head">
+        <h2>Asset performance</h2>
+        <span class="sub">asset touch → MQL → meeting → opportunity</span>
+        <div class="funnel-toggle" id="assetToggle">
+          <button class="active" data-mode="rate">Rate</button>
+          <button data-mode="count">Count</button>
+        </div>
+      </div>
+      <table>
+        <thead><tr><th>Asset</th><th class="num">Engaged</th><th class="num" id="assetCol2Head">→MQL</th><th class="num" id="assetCol3Head">→Mtg</th><th class="num" id="assetLastHead">Mtg→Opp</th></tr></thead>
+        <tbody id="assetBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Reason panels -->
+  <div class="grid-3" id="reasonGrid"></div>
+
+  <footer>OX Security · MQL → Meeting Performance · sample analytics view</footer>
+</div>
+
+<script>
+/* ---------------- Base dataset (Last 30 days) ---------------- */
+const base = {
+  kpis: [
+    {label:"MQLs routed to SDR", value:482, color:"var(--primary)"},
+    {label:"SDR acceptance rate", value:76, suffix:"%", accent:true},
+    {label:"Returned to Marketing", value:62, color:"var(--coral)"},
+    {label:"MQL → Meeting Held", value:11.2, suffix:"%", accent:true},
+    {label:"Opportunities Created", value:29, color:"var(--heliotrope)"},
+    {label:"Median accept / return time", value:3.4, suffix:"h", isTime:true, color:"var(--amber)"},
+  ],
+  lane1: [
+    {v:760, l:"Scored leads", cls:""},
+    {v:482, l:"MQL → SDR", cls:"n-primary"},
+    {v:193, l:"Marketing Nurture", cls:"n-warn"},
+    {v:61,  l:"Hard Disqualified", cls:"n-danger"},
+    {v:24,  l:"Manual Review", cls:""},
+  ],
+  lane2: [
+    {v:482, l:"MQLs received", cls:""},
+    {v:366, l:"Accepted / SAL", cls:"n-good"},
+    {v:62,  l:"Returned to Marketing", cls:"n-warn"},
+    {v:30,  l:"Rejected / Rerouted", cls:"n-danger"},
+    {v:24,  l:"Pending Review", cls:""},
+  ],
+  funnel: [
+    {v:366, l:"Accepted / SAL"},
+    {v:351, l:"Outreach Started"},
+    {v:301, l:"First Touch in SLA"},
+    {v:126, l:"Engaged"},
+    {v:71,  l:"Meeting Booked"},
+    {v:54,  l:"Meeting Held"},
+    {v:29,  l:"Opportunity Created"},
+  ],
+  channel: [
+    {name:"Organic Search", leads:420, l2m:24.8, m2mtg:18.3, mtg2opp:57.7, opps:11},
+    {name:"Direct Website", leads:310, l2m:27.7, m2mtg:16.3, mtg2opp:57.2, opps:8},
+    {name:"Physical Event", leads:190, l2m:37.9, m2mtg:13.9, mtg2opp:50.0, opps:5},
+    {name:"Paid Search", leads:510, l2m:15.5, m2mtg:11.4, mtg2opp:44.4, opps:4},
+    {name:"Paid Social", leads:680, l2m:13.4, m2mtg:5.5, mtg2opp:20.0, opps:1},
+  ],
+  asset: [
+    {name:"Demo Request", eng:64, m1:71.9, m2:32.6, opps:9, mtg2opp:60.0},
+    {name:"Product Webinar", eng:230, m1:31.3, m2:18.1, opps:6, mtg2opp:46.0},
+    {name:"Security Report", eng:355, m1:22.5, m2:12.5, opps:5, mtg2opp:50.1},
+    {name:"Case Study", eng:198, m1:18.7, m2:10.8, opps:3, mtg2opp:75.0},
+    {name:"Blog / Guide", eng:620, m1:9.7, m2:5.0, opps:1, mtg2opp:33.2},
+  ],
+  reasons: [
+    {
+      title:"SDR intake exceptions", sub:"before outreach", color:"var(--amber)",
+      items:[
+        {l:"Existing opportunity", v:18},
+        {l:"Missing / bad data", v:13},
+        {l:"Unsupported territory", v:10},
+        {l:"Duplicate / reroute", v:8},
+      ]
+    },
+    {
+      title:"SDR unqualified reasons", sub:"after outreach · permanent", color:"var(--coral)",
+      items:[
+        {l:"Company not in ICP", v:28},
+        {l:"Wrong persona", v:20},
+        {l:"No relevant use case", v:15},
+        {l:"Unsupported technology", v:10},
+        {l:"Invalid contact", v:7},
+      ]
+    },
+    {
+      title:"SDR nurture reasons", sub:"after outreach", color:"var(--heliotrope)",
+      items:[
+        {l:"Unresponsive after cadence", v:38},
+        {l:"Timing / not a priority", v:24},
+        {l:"No budget now", v:15},
+        {l:"No capacity to evaluate", v:12},
+        {l:"Evaluation planned later", v:8},
+      ]
+    },
+  ]
+};
+
+const rangeFactor = {"30d":1, "week":0.22, "month":0.25, "quarter":2.2};
+let funnelMode = "count";
+let channelMode = "rate";
+let assetMode = "rate";
+
+function scale(v, f, minOne){
+  const r = Math.round(v*f);
+  return minOne ? Math.max(1,r) : r;
+}
+
+function pillClass(v){
+  if(v>=20) return "hi";
+  if(v>=10) return "mid";
+  return "lo";
+}
+
+function render(range){
+  const f = rangeFactor[range];
+
+  /* KPIs */
+  const kpiStrip = document.getElementById("kpiStrip");
+  kpiStrip.innerHTML = base.kpis.map(k=>{
+    let val;
+    if(k.isTime){ val = (k.value*(range==="30d"?1: range==="week"?0.85: range==="month"?0.9 :1.2)).toFixed(1)+k.suffix; }
+    else if(k.suffix==="%"){ val = k.value.toFixed(1).replace(/\.0$/,'') + k.suffix; }
+    else { val = scale(k.value, f, true).toLocaleString(); }
+    return `<div class="kpi" style="--kpi-color:${k.color||'var(--primary)'}">
+        <div class="label">${k.label}</div>
+        <div class="value ${k.accent?'accent':''}">${val}</div>
+      </div>`;
+  }).join("");
+
+  /* Lifecycle lanes */
+  function laneHTML(lane){
+    return lane.map((n,i)=>{
+      const arrow = i < lane.length-1 ? `<div class="arrow">→</div>` : "";
+      return `<div class="node ${n.cls}">
+          <div class="n-val">${scale(n.v,f,true).toLocaleString()}</div>
+          <div class="n-label">${n.l}</div>
+        </div>${arrow}`;
+    }).join("");
+  }
+  document.getElementById("lane1").innerHTML = laneHTML(base.lane1);
+  document.getElementById("lane2").innerHTML = laneHTML(base.lane2);
+
+  /* Funnel */
+  const scaled = base.funnel.map(s=>({...s, v:scale(s.v,f,true)}));
+  const top = scaled[0].v;
+  const maxV = Math.max(...scaled.map(s=>s.v));
+  const funnelEl = document.getElementById("funnel");
+  funnelEl.innerHTML = scaled.map((s,i)=>{
+    const pct = ((s.v/top)*100);
+    const heightPct = (s.v/maxV)*100;
+    const displayVal = funnelMode==="count" ? s.v.toLocaleString() : pct.toFixed(0)+"%";
+    const chevron = i < scaled.length-1 ? `<div class="fchevron">›</div>` : "";
+    return `<div class="fstep ${i===scaled.length-1?'final':''}">
+        <div class="fval">${displayVal}</div>
+        <div class="fpct">${funnelMode==="count" ? pct.toFixed(0)+"%" : s.v.toLocaleString()}</div>
+        <div class="fbar-track"><div class="fbar" style="height:${heightPct}%"></div></div>
+        <div class="flabel">${s.l}</div>
+      </div>${chevron}`;
+  }).join("");
+
+  /* Channel table */
+  document.getElementById("channelLastHead").textContent = channelMode==="rate" ? "Mtg→Opp" : "Opps";
+  document.getElementById("channelCol2Head").textContent = channelMode==="rate" ? "Lead→MQL" : "MQLs";
+  document.getElementById("channelCol3Head").textContent = channelMode==="rate" ? "MQL→Mtg" : "Meetings";
+  document.getElementById("channelBody").innerHTML = base.channel.map(c=>{
+    const leadsS = scale(c.leads,f,true);
+    const mqlCount = Math.round(leadsS * c.l2m/100);
+    const mtgCount = Math.round(mqlCount * c.m2mtg/100);
+    const oppsCount = scale(c.opps,f,true);
+    const col2 = channelMode==="rate" ? `<span class="pill ${pillClass(c.l2m)}">${c.l2m}%</span>` : mqlCount.toLocaleString();
+    const col3 = channelMode==="rate" ? `<span class="pill ${pillClass(c.m2mtg)}">${c.m2mtg}%</span>` : mtgCount.toLocaleString();
+    const col4 = channelMode==="rate" ? `<span class="pill ${pillClass(c.mtg2opp)}">${c.mtg2opp}%</span>` : oppsCount.toLocaleString();
+    return `<tr>
+      <td class="name">${c.name}</td>
+      <td class="num">${leadsS.toLocaleString()}</td>
+      <td class="num">${col2}</td>
+      <td class="num">${col3}</td>
+      <td class="num">${col4}</td>
+    </tr>`;
+  }).join("");
+
+  /* Asset table */
+  document.getElementById("assetLastHead").textContent = assetMode==="rate" ? "Mtg→Opp" : "Opps";
+  document.getElementById("assetCol2Head").textContent = assetMode==="rate" ? "→MQL" : "MQLs";
+  document.getElementById("assetCol3Head").textContent = assetMode==="rate" ? "→Mtg" : "Meetings";
+  document.getElementById("assetBody").innerHTML = base.asset.map(a=>{
+    const engS = scale(a.eng,f,true);
+    const mqlCount = Math.round(engS * a.m1/100);
+    const mtgCount = Math.round(mqlCount * a.m2/100);
+    const oppsCount = scale(a.opps,f,true);
+    const col2 = assetMode==="rate" ? `<span class="pill ${pillClass(a.m1)}">${a.m1}%</span>` : mqlCount.toLocaleString();
+    const col3 = assetMode==="rate" ? `<span class="pill ${pillClass(a.m2)}">${a.m2}%</span>` : mtgCount.toLocaleString();
+    const col4 = assetMode==="rate" ? `<span class="pill ${pillClass(a.mtg2opp)}">${a.mtg2opp}%</span>` : oppsCount.toLocaleString();
+    return `<tr>
+      <td class="name">${a.name}</td>
+      <td class="num">${engS.toLocaleString()}</td>
+      <td class="num">${col2}</td>
+      <td class="num">${col3}</td>
+      <td class="num">${col4}</td>
+    </tr>`;
+  }).join("");
+
+  /* Reason panels */
+  const grid = document.getElementById("reasonGrid");
+  grid.innerHTML = base.reasons.map(panel=>{
+    const maxV = Math.max(...panel.items.map(it=>it.v));
+    const rows = panel.items.map(it=>{
+      const sv = scale(it.v,f,true);
+      const smax = scale(maxV,f,true);
+      const w = (sv/smax)*100;
+      return `<div class="rrow">
+          <div class="rname">${it.l}</div>
+          <div class="rtrack"><div class="rfill" style="width:${w}%; background:${panel.color}"></div></div>
+          <div class="rval">${sv}</div>
+        </div>`;
+    }).join("");
+    return `<div class="rpanel">
+        <div class="rpanel-head"><span class="bar-dot" style="background:${panel.color}"></span><h3>${panel.title}</h3></div>
+        <div class="rpanel-sub">${panel.sub}</div>
+        ${rows}
+      </div>`;
+  }).join("");
+}
+
+document.getElementById("rangeSelect").addEventListener("change", e=>{
+  render(e.target.value);
+});
+
+document.querySelectorAll("#funnelToggle button").forEach(btn=>{
+  btn.addEventListener("click", ()=>{
+    document.querySelectorAll("#funnelToggle button").forEach(b=>b.classList.remove("active"));
+    btn.classList.add("active");
+    funnelMode = btn.dataset.mode;
+    render(document.getElementById("rangeSelect").value);
+  });
+});
+
+document.querySelectorAll("#channelToggle button").forEach(btn=>{
+  btn.addEventListener("click", ()=>{
+    document.querySelectorAll("#channelToggle button").forEach(b=>b.classList.remove("active"));
+    btn.classList.add("active");
+    channelMode = btn.dataset.mode;
+    render(document.getElementById("rangeSelect").value);
+  });
+});
+
+document.querySelectorAll("#assetToggle button").forEach(btn=>{
+  btn.addEventListener("click", ()=>{
+    document.querySelectorAll("#assetToggle button").forEach(b=>b.classList.remove("active"));
+    btn.classList.add("active");
+    assetMode = btn.dataset.mode;
+    render(document.getElementById("rangeSelect").value);
+  });
+});
+
+render("30d");
+</script>
+</body>
+</html>
