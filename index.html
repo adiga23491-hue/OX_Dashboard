@@ -184,11 +184,25 @@
     .arrow{display:none;}
   }
 
-  .section.compact .lane-row{flex-wrap:wrap; gap:8px;}
-  .section.compact .node{flex:1 1 128px;}
+  .section.compact .lane-row{flex-wrap:wrap; gap:6px;}
+  .section.compact .node{flex:1 1 96px; padding:10px 10px;}
+  .section.compact .node .n-val{font-size:17px;}
+  .section.compact .node .n-label{font-size:10.5px;}
   .section.compact .arrow{display:none;}
-  .section.compact .lane{margin-bottom:14px;}
+  .section.compact .lane{margin-bottom:12px;}
   .section.compact .lane:last-child{margin-bottom:0;}
+  .section.compact .lane-title{font-size:11px; margin-bottom:8px;}
+
+  .grid-2.hero-grid{grid-template-columns:1fr 1fr;}
+  .hero-grid .fstep{flex:1 1 62px; min-width:62px;}
+  .hero-grid .fval{font-size:15px;}
+  .hero-grid .fpct{font-size:10px;}
+  .hero-grid .flabel{font-size:10px;}
+  .hero-grid .fbar-track{height:88px;}
+  .hero-grid .fchevron{margin-bottom:40px;}
+  @media (max-width:680px){
+    .grid-2.hero-grid{grid-template-columns:1fr;}
+  }
 
   /* ---------- Funnel ---------- */
   .funnel-toggle{display:flex; gap:4px; background:var(--surface-2); border:1px solid var(--line); border-radius:9px; padding:3px;}
@@ -287,7 +301,7 @@
   <!-- KPI strip -->
   <div class="kpi-strip" id="kpiStrip"></div>
 
-  <div class="grid-2" style="align-items:start;">
+  <div class="grid-2 hero-grid" style="align-items:start;">
     <!-- Lifecycle status map -->
     <div class="section compact">
       <div class="section-head">
