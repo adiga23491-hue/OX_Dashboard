@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>MQL → Meeting Performance</title>
+<title>Marketing Pipeline Overview</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -284,8 +284,7 @@
     <div class="brand">
       <div class="brand-mark">OX</div>
       <div class="titles">
-        <h1>MQL → Meeting Performance</h1>
-        <p>Illustrative data · clear ownership and lifecycle statuses</p>
+        <h1>Marketing Pipeline Overview</h1>
       </div>
     </div>
     <div class="filters">
@@ -327,13 +326,12 @@
   <!-- Funnel -->
   <div class="section compact">
     <div class="section-head">
-      <h2>Accepted-lead conversion funnel</h2>
+      <h2>BDR Accepted → Opportunity</h2>
       <div class="funnel-toggle" id="funnelToggle">
         <button class="active" data-mode="count">Count</button>
         <button data-mode="pct">Rate</button>
       </div>
     </div>
-    <div class="sub" style="margin:-6px 0 8px;">outreach begins only after SDR acceptance</div>
     <div class="funnel" id="funnel"></div>
   </div>
 
@@ -342,7 +340,6 @@
     <div class="section">
       <div class="section-head">
         <h2>Sub-Channel performance</h2>
-        <span class="sub">from new leads to opportunity</span>
         <div class="funnel-toggle" id="channelToggle">
           <button class="active" data-mode="rate">Rate</button>
           <button data-mode="count">Count</button>
@@ -357,7 +354,6 @@
     <div class="section">
       <div class="section-head">
         <h2>Asset performance</h2>
-        <span class="sub">asset touch → MQL → meeting → opportunity</span>
         <div class="funnel-toggle" id="assetToggle">
           <button class="active" data-mode="rate">Rate</button>
           <button data-mode="count">Count</button>
@@ -373,7 +369,6 @@
   <!-- Reason panels -->
   <div class="grid-3" id="reasonGrid"></div>
 
-  <footer>OX Security · MQL → Meeting Performance · sample analytics view</footer>
 </div>
 
 <script>
@@ -383,7 +378,7 @@ const base = {
     {label:"MQLs routed to SDR", value:482, color:"var(--primary)"},
     {label:"SDR acceptance rate", value:76, suffix:"%", accent:true},
     {label:"Returned to Marketing", value:62, color:"var(--coral)"},
-    {label:"MQL → Meeting Held", value:11.2, suffix:"%", accent:true},
+    {label:"MQL → Meeting Occurred", value:11.2, suffix:"%", accent:true},
     {label:"Opportunities Created", value:29, color:"var(--heliotrope)"},
     {label:"Median accept / return time", value:3.4, suffix:"h", isTime:true, color:"var(--amber)"},
   ],
@@ -437,21 +432,21 @@ const base = {
     {
       title:"SDR unqualified reasons", sub:"after outreach · permanent", color:"var(--coral)",
       items:[
-        {l:"Company not in ICP", v:28},
-        {l:"Wrong persona", v:20},
-        {l:"No relevant use case", v:15},
-        {l:"Unsupported technology", v:10},
-        {l:"Invalid contact", v:7},
+        {l:"Company too small", v:28},
+        {l:"Tech Stack Not Supported", v:20},
+        {l:"Not a Decision Maker", v:15},
+        {l:"Irrelevant Title", v:10},
+        {l:"Unemployed", v:7},
       ]
     },
     {
       title:"SDR nurture reasons", sub:"after outreach", color:"var(--heliotrope)",
       items:[
-        {l:"Unresponsive after cadence", v:38},
-        {l:"Timing / not a priority", v:24},
-        {l:"No budget now", v:15},
-        {l:"No capacity to evaluate", v:12},
-        {l:"Evaluation planned later", v:8},
+        {l:"Unresponsive - Finished Cadence", v:38},
+        {l:"Not Interested Now", v:24},
+        {l:"No Budget", v:15},
+        {l:"No Pain", v:12},
+        {l:"Existing Solution - Competitor", v:8},
       ]
     },
   ]
