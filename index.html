@@ -184,22 +184,25 @@
     .arrow{display:none;}
   }
 
-  .section.compact .lane-row{flex-wrap:wrap; gap:6px;}
-  .section.compact .node{flex:1 1 96px; padding:10px 10px;}
-  .section.compact .node .n-val{font-size:17px;}
-  .section.compact .node .n-label{font-size:10.5px;}
-  .section.compact .arrow{display:none;}
-  .section.compact .lane{margin-bottom:12px;}
+  .section.compact{padding:18px 24px 20px;}
+  .section.compact .section-head{margin-bottom:12px;}
+  .section.compact .lane-row{gap:0;}
+  .section.compact .node{flex:1; padding:10px 14px;}
+  .section.compact .node .n-val{font-size:18px;}
+  .section.compact .node .n-label{font-size:11px;}
+  .section.compact .arrow{display:flex;}
+  .section.compact .lane{margin-bottom:10px;}
   .section.compact .lane:last-child{margin-bottom:0;}
-  .section.compact .lane-title{font-size:11px; margin-bottom:8px;}
+  .section.compact .lane-title{font-size:11px; margin-bottom:6px;}
+  .section.compact .lane-drop{padding:2px 0 2px 12px;}
 
   .grid-2.hero-grid{grid-template-columns:1fr 1fr;}
   .section.compact .fstep{flex:1 1 62px; min-width:62px;}
   .section.compact .fval{font-size:15px;}
-  .section.compact .fpct{font-size:10px;}
-  .section.compact .flabel{font-size:10px;}
-  .section.compact .fbar-track{height:88px;}
-  .section.compact .fchevron{margin-bottom:40px;}
+  .section.compact .fpct{font-size:10px; margin-bottom:6px;}
+  .section.compact .flabel{font-size:10px; margin-top:6px;}
+  .section.compact .fbar-track{height:66px;}
+  .section.compact .fchevron{margin-bottom:30px;}
   @media (max-width:680px){
     .grid-2.hero-grid{grid-template-columns:1fr;}
   }
@@ -302,7 +305,7 @@
   <div class="kpi-strip" id="kpiStrip"></div>
 
   <!-- Lifecycle status map -->
-  <div class="section compact" style="max-width:640px;">
+  <div class="section compact">
     <div class="section-head">
       <h2>Lifecycle status map</h2>
       <span class="sub">every lead has a visible destination</span>
@@ -322,7 +325,7 @@
   </div>
 
   <!-- Funnel -->
-  <div class="section compact" style="max-width:640px;">
+  <div class="section compact">
     <div class="section-head">
       <h2>Accepted-lead conversion funnel</h2>
       <div class="funnel-toggle" id="funnelToggle">
@@ -330,7 +333,7 @@
         <button data-mode="pct">Rate</button>
       </div>
     </div>
-    <div class="sub" style="margin:-10px 0 14px;">outreach begins only after SDR acceptance</div>
+    <div class="sub" style="margin:-6px 0 8px;">outreach begins only after SDR acceptance</div>
     <div class="funnel" id="funnel"></div>
   </div>
 
