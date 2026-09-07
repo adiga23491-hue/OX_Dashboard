@@ -184,6 +184,12 @@
     .arrow{display:none;}
   }
 
+  .section.compact .lane-row{flex-wrap:wrap; gap:8px;}
+  .section.compact .node{flex:1 1 128px;}
+  .section.compact .arrow{display:none;}
+  .section.compact .lane{margin-bottom:14px;}
+  .section.compact .lane:last-child{margin-bottom:0;}
+
   /* ---------- Funnel ---------- */
   .funnel-toggle{display:flex; gap:4px; background:var(--surface-2); border:1px solid var(--line); border-radius:9px; padding:3px;}
   .funnel-toggle button{
@@ -191,8 +197,8 @@
     color:var(--muted); cursor:pointer; transition:.15s;
   }
   .funnel-toggle button.active{background:var(--surface); color:var(--primary); box-shadow:0 1px 3px rgba(0,0,0,.08);}
-  .funnel{display:flex; align-items:flex-end; gap:6px; margin-top:6px;}
-  .fstep{flex:1; min-width:0; text-align:center; cursor:default;}
+  .funnel{display:flex; align-items:flex-end; gap:6px; margin-top:6px; overflow-x:auto; padding-bottom:6px;}
+  .fstep{flex:1 1 92px; min-width:92px; text-align:center; cursor:default;}
   .fstep .fval{font-family:'Space Grotesk'; font-size:19px; font-weight:600;}
   .fstep .fpct{font-size:11px; color:var(--muted); margin-bottom:8px; font-family:'JetBrains Mono';}
   .fbar-track{height:120px; display:flex; align-items:flex-end; background:var(--track); border-radius:8px 8px 3px 3px; overflow:hidden;}
@@ -281,37 +287,39 @@
   <!-- KPI strip -->
   <div class="kpi-strip" id="kpiStrip"></div>
 
-  <!-- Lifecycle status map -->
-  <div class="section">
-    <div class="section-head">
-      <h2>Lifecycle status map</h2>
-      <span class="sub">every lead has a visible destination</span>
-    </div>
+  <div class="grid-2" style="align-items:start;">
+    <!-- Lifecycle status map -->
+    <div class="section compact">
+      <div class="section-head">
+        <h2>Lifecycle status map</h2>
+        <span class="sub">every lead has a visible destination</span>
+      </div>
 
-    <div class="lane">
-      <div class="lane-title"><span class="dot" style="background:var(--primary)"></span>1 · Marketing qualification</div>
-      <div class="lane-row" id="lane1"></div>
-    </div>
+      <div class="lane">
+        <div class="lane-title"><span class="dot" style="background:var(--primary)"></span>1 · Marketing qualification</div>
+        <div class="lane-row" id="lane1"></div>
+      </div>
 
-    <div class="lane-drop">↓</div>
+      <div class="lane-drop">↓</div>
 
-    <div class="lane">
-      <div class="lane-title"><span class="dot" style="background:var(--heliotrope)"></span>2 · SDR feedback checkpoint</div>
-      <div class="lane-row" id="lane2"></div>
-    </div>
-  </div>
-
-  <!-- Funnel -->
-  <div class="section">
-    <div class="section-head">
-      <h2>Accepted-lead conversion funnel</h2>
-      <div class="funnel-toggle" id="funnelToggle">
-        <button class="active" data-mode="count">Count</button>
-        <button data-mode="pct">Rate</button>
+      <div class="lane">
+        <div class="lane-title"><span class="dot" style="background:var(--heliotrope)"></span>2 · SDR feedback checkpoint</div>
+        <div class="lane-row" id="lane2"></div>
       </div>
     </div>
-    <div class="sub" style="margin:-10px 0 14px;">outreach begins only after SDR acceptance</div>
-    <div class="funnel" id="funnel"></div>
+
+    <!-- Funnel -->
+    <div class="section">
+      <div class="section-head">
+        <h2>Accepted-lead conversion funnel</h2>
+        <div class="funnel-toggle" id="funnelToggle">
+          <button class="active" data-mode="count">Count</button>
+          <button data-mode="pct">Rate</button>
+        </div>
+      </div>
+      <div class="sub" style="margin:-10px 0 14px;">outreach begins only after SDR acceptance</div>
+      <div class="funnel" id="funnel"></div>
+    </div>
   </div>
 
   <!-- Channel + Asset performance -->
